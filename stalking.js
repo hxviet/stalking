@@ -87,27 +87,28 @@ var mem = [
     "Nguyễn Minh Đức"
 ];
 
-let statusshare = new Array(60).fill(0);
-let statusreact = new Array(60).fill(0);
-let statuscmt = new Array(60).fill(0);
 
 function ban(s) {
-    if (s >= 0 && s <= 6) return " (Chuyên môn)"
-    else if (s >= 7 && s <= 10) return " (Sự kiện)"
-    else if (s >= 11 && s <= 16) return " (Truyền thông)"
-    else if (s >= 17 && s <= 23) return " (MedDes)"
-    else if (s >= 24 && s <= 29) return " (Nhân sự)"
-    else if (s >= 30 && s <= 36) return " (Hậu cần)"
-    else return " (Tài chính)"
+    if (s >= 0 && s <= 6) return " (Chuyên môn)";
+    else if (s >= 7 && s <= 10) return " (Sự kiện)";
+    else if (s >= 11 && s <= 16) return " (Truyền thông)";
+    else if (s >= 17 && s <= 23) return " (MedDes)";
+    else if (s >= 24 && s <= 29) return " (Nhân sự)";
+    else if (s >= 30 && s <= 36) return " (Hậu cần)";
+    else return " (Tài chính)";
 }
 
-function checkshare() {
-    var nguoishare = []
+function checkShare() {
+    let statusshare = new Array(60).fill(0);
+    var nguoishare = [];
     var share = document.getElementsByClassName("fwb fcg");
     for (var i = 0; i < share.length; i++) {
-        var tmp = share[i].getElementsByTagName("a")
-        var s = tmp[0].getAttribute("href")
-        nguoishare.push(s)
+        var tmp = share[i].getElementsByTagName("a");
+        var s = tmp[0].getAttribute("href");
+        if (s.indexOf('__tn') != -1) {
+            s = s.substring(0, s.indexOf('__tn') - 1);
+        }
+        nguoishare.push(s);
     }
     for (var i = 0; i < nguoishare.length; i++) {
         if (link.includes(nguoishare[i])) {
@@ -121,12 +122,16 @@ function checkshare() {
     }
 }
 
-function checkreact() {
+function checkReact() {
+    let statusreact = new Array(60).fill(0);
     var nguoireact = []
     var react = document.getElementsByClassName("_5j0e fsl fwb fcb");
     for (var i = 0; i < react.length; i++) {
         var tmp = react[i].getElementsByTagName("a");
-        var s = tmp[0].getAttribute("href")
+        var s = tmp[0].getAttribute("href");
+        if (s.indexOf('fref') != -1) {
+            s = s.substring(0, s.indexOf('fref') - 1);
+        }
         nguoireact.push(s)
     }
     for (var i = 0; i < nguoireact.length; i++) {
@@ -141,16 +146,25 @@ function checkreact() {
     }
 }
 
-function checkcmt(min) {
-    let replies = document.getElementsByClassName('_4ayk')
+function checkComment(min) {
+    let statuscmt = new Array(60).fill(0);
+    if (typeof min != 'number') {
+        return 'Ôi bạn ơi, bạn đang gặp lỗi là do bạn viết sai cú pháp đấy. Bạn đọc lại hướng dẫn sử dụng nhé.';
+    }
+    let replies = document.getElementsByClassName('_4ayk');
     for (let i = 0; i < replies.length; i++) {
         replies[i].click();
     }
     var nguoicmt = []
-    var cmt = document.getElementsByClassName("_4kk6");
+    var cmt = document.getElementsByClassName("_2b05");
     for (var i = 0; i < cmt.length; i++) {
-        var s = cmt[i].getAttribute("href");
-        s = s.substring(s.indexOf('.facebook'), s.length)
+        var s = cmt[i].getElementsByTagName("a")[0].getAttribute("href");
+        let endIndex = s.indexOf('fref=');
+        endIndex = (endIndex == -1) ? s.length : endIndex - 1;
+        s = s.substring(s.indexOf('.facebook'), endIndex);
+        if (s.indexOf('.facebook') == -1) {
+            s = '.facebook.com' + s;
+        }
         nguoicmt.push('https://www' + s);
     }
     for (var i = 0; i < nguoicmt.length; i++) {
@@ -160,7 +174,7 @@ function checkcmt(min) {
     }
     for (var i = 0; i < link.length; i++) {
         if (statuscmt[i] < min) {
-            console.log(mem[i] + ban(i) + " chưa viết ít nhất " + min + " bình luận.");
+            console.log(mem[i] + ban(i) + " mới viết " + statuscmt[i] + " bình luận.");
         }
     }
 }
